@@ -1,47 +1,28 @@
-#![feature(asm, lang_items, panic_handler)]
-
+#![allow(dead_code)]
 #![no_std]
 #![no_main]
 
-extern crate arduino;
-
-use arduino::{DDRB, PORTB};
-use core::ptr::write_volatile;
+use arduino_simple_io::io::{IOState::*, Input, Output, Pin};
 
 #[no_mangle]
-pub extern fn main() {
-    // Set all PORTB pins up as outputs
-    unsafe { write_volatile(DDRB, 0xFF) }
+pub extern "C" fn main() {
+    let mut inputs = [Pin::<Input>::port(3), Pin::port(4), Pin::port(5)];
+    let mut pin13 = Pin::<Output>::port(13);
+
+    inputs.iter_mut().for_each(|i| i.on());
 
     loop {
-        // Set all pins on PORTB to high.
-        unsafe { write_volatile(PORTB, 0xFF) }
+        let mut flg = false;
+        for i in inputs.iter() {
+            if let OFF = i.read() {
+                flg = true;
+            }
+        }
 
-        small_delay();
-
-        // Set all pins on PORTB to low.
-        unsafe { write_volatile(PORTB, 0x00) }
-
-        small_delay();
+        if flg {
+            pin13.on();
+        } else {
+            pin13.off();
+        }
     }
 }
-
-/// A small busy loop.
-fn small_delay() {
-    for _ in 0..400000 {
-        unsafe { asm!("" :::: "volatile")}
-    }
-}
-
-// These do not need to be in a module, but we group them here for clarity.
-pub mod std {
-    #[lang = "eh_personality"]
-    pub unsafe extern "C" fn rust_eh_personality(_state: (), _exception_object: *mut (), _context: *mut ()) -> () {
-    }
-
-    #[panic_handler]
-    fn panic(_info: &::core::panic::PanicInfo) -> ! {
-        loop {}
-    }
-}
-

@@ -1,7 +1,8 @@
 [package]
-name = "blink"
+name = "arduino_simple_io"
 version = "0.1.0"
 authors = ["Dylan McKay <me@dylanmckay.io>"]
+edition="2018"
 
 [dependencies]
 arduino = "0.1"

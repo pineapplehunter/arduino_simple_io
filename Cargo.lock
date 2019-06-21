@@ -6,7 +6,7 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "blink"
+name = "arduino_simple_io"
 version = "0.1.0"
 dependencies = [
  "arduino 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
